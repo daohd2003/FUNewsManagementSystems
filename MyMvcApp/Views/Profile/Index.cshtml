@@ -1,0 +1,39 @@
+﻿@model FUDTOs.SystemAccountDTO
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container mt-4">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+
+    <div class="card shadow">
+        <div class="card-body">
+            <h4 class="card-title">@Model.AccountName</h4>
+
+            <dl class="row mt-3">
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@Model.AccountEmail</dd>
+
+                <dt class="col-sm-3">Role</dt>
+                <dd class="col-sm-9">
+                    @{
+                        var roleName = Model.AccountRole switch
+                        {
+                            0 => "Admin",
+                            1 => "Staff",
+                            2 => "Lecture",
+                            _ => "Unknown"
+                        };
+                        @roleName
+                    }
+                </dd>
+            </dl>
+
+            <a asp-action="Edit" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit Profile
+            </a>
+        </div>
+    </div>
+</div>

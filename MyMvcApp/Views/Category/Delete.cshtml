@@ -1,0 +1,67 @@
+﻿@model FUDTOs.CategoryDTO
+
+@{
+    ViewData["Title"] = "Delete Category";
+}
+
+<div class="container mt-5">
+    <h1 class="mb-4">@ViewData["Title"]</h1>
+
+    <div class="alert alert-danger shadow-sm" role="alert">
+        <h4 class="alert-heading">Are you sure you want to delete this category?</h4>
+        <p>This action <strong>cannot be undone</strong>.</p>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3 fw-semibold">@Html.DisplayNameFor(m => m.CategoryName)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.CategoryName)</dd>
+
+                <dt class="col-sm-3 fw-semibold">@Html.DisplayNameFor(m => m.CategoryDesciption)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(m => m.CategoryDesciption)</dd>
+
+                <dt class="col-sm-3 fw-semibold">@Html.DisplayNameFor(m => m.IsActive)</dt>
+                <dd class="col-sm-9">
+                    <span class="badge @(Model.IsActive ? "bg-success" : "bg-secondary")">
+                        @(Model.IsActive ? "Active" : "Inactive")
+                    </span>
+                </dd>
+
+                <dt class="col-sm-3 fw-semibold">Parent Category</dt>
+                <dd class="col-sm-9">@(Model.ParentCategory?.CategoryName ?? "None")</dd>
+            </dl>
+        </div>
+    </div>
+
+    <form asp-action="Delete" id="deleteForm" class="mt-4">
+        <input type="hidden" asp-for="CategoryId" />
+
+        <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+            <i class="fas fa-trash-alt"></i> Confirm Delete
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('deleteForm').submit();
+                }
+            })
+        }
+    </script>
+}

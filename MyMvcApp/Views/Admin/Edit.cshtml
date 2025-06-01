@@ -1,0 +1,28 @@
+﻿@model FUDTOs.SystemAccountDTO
+
+@{
+    ViewData["Title"] = "Edit Account";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="AccountId" />
+    <div class="form-group">
+        <label>Full Name</label>
+        <input asp-for="AccountName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Email</label>
+        <input asp-for="AccountEmail" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Role</label>
+        <select asp-for="AccountRole" class="form-control">
+            <option value="1" selected="@((Model.AccountRole == 1).ToString().ToLower())">Staff</option>
+            <option value="2" selected="@((Model.AccountRole == 2).ToString().ToLower())">Lecture</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

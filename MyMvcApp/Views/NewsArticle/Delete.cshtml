@@ -1,0 +1,73 @@
+﻿@model FUDTOs.NewsArticleDTO
+
+@{
+    ViewData["Title"] = "Delete News Article";
+}
+
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+
+    <div class="alert alert-danger">
+        <h4>Are you sure you want to delete this article?</h4>
+        <p class="mb-0">This action cannot be undone.</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h5>@Model.NewsTitle</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Headline)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Headline)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.CreatedDate)</dt>
+                <dd class="col-sm-9">@Model.CreatedDate?.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Category)</dt>
+                <dd class="col-sm-9">@Model.Category?.CategoryName</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.NewsStatus)</dt>
+                <dd class="col-sm-9">
+                    <span class="badge @(Model.NewsStatus ? "bg-success" : "bg-secondary")">
+                        @(Model.NewsStatus ? "Active" : "Inactive")
+                    </span>
+                </dd>
+
+                <dt class="col-sm-3">Created By</dt>
+                <dd class="col-sm-9">@Model.CreatedBy?.AccountName</dd>
+            </dl>
+        </div>
+    </div>
+
+    <form asp-action="Delete" id="deleteForm" class="mt-4">
+        <input type="hidden" asp-for="NewsArticleId" />
+
+        <button type="button" class="btn btn-danger" onclick="confirmDelete()">
+            <i class="fas fa-trash-alt"></i> Confirm Delete
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </a>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('deleteForm').submit();
+                }
+            })
+        }
+    </script>
+}

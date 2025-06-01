@@ -1,0 +1,32 @@
+﻿@model FUDTOs.SystemAccountDTO
+
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Create" method="post" autocomplete="off">
+    <div class="form-group">
+        <label>Full Name</label>
+        <input asp-for="AccountName" class="form-control" autocomplete="off" />
+    </div>
+    <div class="form-group">
+        <label>Email</label>
+        <input asp-for="AccountEmail" class="form-control" autocomplete="off" />
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <input asp-for="AccountPassword" class="form-control" type="password" autocomplete="new-password" />
+    </div>
+    <div class="form-group">
+        <label>Role</label>
+        <select asp-for="AccountRole" class="form-control">
+            <option value="">-- Select Role --</option>
+            <option value="1">Staff</option>
+            <option value="2">Lecture</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

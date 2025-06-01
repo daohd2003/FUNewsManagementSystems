@@ -1,0 +1,87 @@
+﻿@model FUDTOs.NewsArticleDTO
+
+@{
+    ViewData["Title"] = "Article Details";
+}
+
+<div class="container">
+    <h1 class="display-4">@ViewData["Title"]</h1>
+    <hr />
+
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4>@Model.NewsTitle</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Headline)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Headline)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Category)</dt>
+                <dd class="col-sm-9">@Model.Category?.CategoryName (@Model.Category?.CategoryDesciption)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.NewsContent)</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.NewsContent)</dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.NewsSource)</dt>
+                <dd class="col-sm-9">
+                    @if (!string.IsNullOrEmpty(Model.NewsSource))
+                    {
+                        <a href="@Model.NewsSource" target="_blank">@Model.NewsSource</a>
+                    }
+                    else
+                    {
+                        <span>N/A</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">@Html.DisplayNameFor(model => model.NewsStatus)</dt>
+                <dd class="col-sm-9">
+                    <span class="badge @(Model.NewsStatus ? "bg-success" : "bg-secondary")">
+                        @(Model.NewsStatus ? "Active" : "Inactive")
+                    </span>
+                </dd>
+
+                <dt class="col-sm-3">Created</dt>
+                <dd class="col-sm-9">
+                    By @Model.CreatedBy?.AccountName (@Model.CreatedBy?.AccountEmail) on @Model.CreatedDate.ToString()
+                </dd>
+
+                <dt class="col-sm-3">Last Updated</dt>
+                <dd class="col-sm-9">
+                    @if (Model.ModifiedDate.HasValue)
+                    {
+                        <text>By @Model.UpdatedBy?.AccountName on @Model.ModifiedDate.Value.ToString("f")</text>
+                    }
+                    else
+                    {
+                        <span>Not modified yet</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+    <div class="mt-4">
+        @if (User.IsInRole("Staff"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.NewsArticleId" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+        }
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-list"></i> Back to List
+        </a>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        dt {
+            font-weight: 500;
+        }
+
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+    </style>
+}

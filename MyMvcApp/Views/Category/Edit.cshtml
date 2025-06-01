@@ -1,0 +1,58 @@
+﻿@model FUDTOs.CategoryDTO
+
+@{
+    ViewData["Title"] = "Edit Category";
+}
+
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Edit">
+                <input type="hidden" asp-for="CategoryId" />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="CategoryName" class="control-label"></label>
+                    <input asp-for="CategoryName" class="form-control" />
+                    <span asp-validation-for="CategoryName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="CategoryDesciption" class="control-label"></label>
+                    <textarea asp-for="CategoryDesciption" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="CategoryDesciption" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="ParentCategoryId" class="control-label"></label>
+                    <select asp-for="ParentCategoryId" class="form-control"
+                            asp-items="ViewBag.ParentCategories">
+                        <option value="">-- Select Parent Category --</option>
+                    </select>
+                    <span asp-validation-for="ParentCategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group form-check mb-3">
+                    <input class="form-check-input" asp-for="IsActive" />
+                    <label class="form-check-label" asp-for="IsActive"></label>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

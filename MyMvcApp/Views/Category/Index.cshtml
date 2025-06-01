@@ -1,0 +1,62 @@
+﻿@model IEnumerable<FUDTOs.CategoryDTO>
+
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="container">
+    <h1>Categories</h1>
+
+    <p>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create New
+        </a>
+    </p>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.CategoryName)</th>
+                    <th>@Html.DisplayNameFor(model => model.CategoryDesciption)</th>
+                    <th>@Html.DisplayNameFor(model => model.IsActive)</th>
+                    <th>@Html.DisplayNameFor(model => model.ParentCategory)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.CategoryName)</td>
+                        <td>@Html.DisplayFor(modelItem => item.CategoryDesciption)</td>
+                        <td>
+                            <span class="badge @(item.IsActive ? "bg-success" : "bg-secondary")">
+                                @(item.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td>@item.ParentCategoryName</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a asp-action="Edit" asp-route-id="@item.CategoryId" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.CategoryId" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .table th, .table td {
+            vertical-align: middle;
+        }
+    </style>
+}

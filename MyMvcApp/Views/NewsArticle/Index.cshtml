@@ -1,0 +1,72 @@
+﻿@model IEnumerable<FUDTOs.NewsArticleDTO>
+
+@{
+    ViewData["Title"] = "News Articles";
+    bool isStaff = User.IsInRole("Staff");
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-primary">📄 News Articles</h2>
+
+        @* Nút Create chỉ hiện khi là Staff *@
+        @if (isStaff)
+        {
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Create New
+            </a>
+        }
+    </div>
+
+    <table class="table table-bordered table-hover shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Created Date</th>
+                <th scope="col">Tags</th>
+                <th scope="col" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="4" class="text-center text-muted">No news articles found.</td>
+                </tr>
+            }
+            else
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.NewsTitle</td>
+                        <td>@item.CreatedDate.ToString()</td>
+                        <td>
+                            @if (item.Tags != null && item.Tags.Any())
+                            {
+                                foreach (var tag in item.Tags)
+                                {
+                                    <span class="badge bg-info text-dark me-1">@tag.TagName</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">No Tags</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @* Chỉ hiện các nút CRUD khi là Staff *@
+                            @if (isStaff)
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.NewsArticleId" class="btn btn-sm btn-primary me-1">Edit</a>
+                                <a asp-action="Delete" asp-route-id="@item.NewsArticleId" class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Are you sure you want to delete this article?');">Delete</a>
+                            }
+                            <a asp-action="Detail" asp-route-id="@item.NewsArticleId" class="btn btn-sm btn-info me-1">Details</a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

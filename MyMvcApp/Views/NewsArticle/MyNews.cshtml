@@ -1,0 +1,49 @@
+﻿@model IEnumerable<FUDTOs.NewsArticleDTO>
+
+@{
+    ViewData["Title"] = "📰 My News History";
+}
+
+<div class="container py-4">
+    <h2 class="mb-4 text-primary"><i class="bi bi-journal-text"></i> @ViewData["Title"]</h2>
+
+    <table class="table table-hover table-bordered align-middle shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">📌 Title</th>
+                <th scope="col">📅 Created Date</th>
+                <th scope="col">📍 Status</th>
+                <th scope="col">📂 Category</th>
+                <th scope="col" class="text-center">⚙️ Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var article in Model)
+            {
+                <tr>
+                    <td>@article.NewsTitle</td>
+                    <td>@article.CreatedDate.ToString()</td>
+                    <td>
+                        @if (article.NewsStatus)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </td>
+                    <td>@article.Category.CategoryName</td>
+                    <td class="text-center">
+                        <a class="btn btn-sm btn-outline-info me-1" href="@Url.Action("Detail", new { id = article.NewsArticleId })">
+                            <i class="bi bi-eye"></i> View
+                        </a>
+                        <a class="btn btn-sm btn-outline-warning" href="@Url.Action("Edit", new { id = article.NewsArticleId })">
+                            <i class="bi bi-pencil-square"></i> Edit
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

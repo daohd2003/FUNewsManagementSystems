@@ -1,0 +1,31 @@
+﻿@model IEnumerable<FUDTOs.NewsArticleDTO>
+
+@{
+    ViewData["Title"] = "Report Results";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Created Date</th>
+            <th>Status</th>
+            <th>Author</th>
+            <th>Category</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var article in Model)
+        {
+            <tr>
+                <td>@article.NewsTitle</td>
+                <td>@article.CreatedDate.ToString()</td>
+                <td>@(article.NewsStatus ? "Active" : "Inactive")</td>
+                <td>@article.CreatedBy.AccountName</td>
+                <td>@article.Category.CategoryName</td>
+            </tr>
+        }
+    </tbody>
+</table>
