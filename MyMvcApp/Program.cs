@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using MyMvcApp.Handlers;
 using Services;
+using System.Net.Http.Headers;
 
 namespace MyMvcApp
 {
@@ -39,6 +40,12 @@ namespace MyMvcApp
             {
                 client.BaseAddress = new Uri(apiBaseAddress);
             }).AddHttpMessageHandler<JwtTokenHandler>();
+
+            builder.Services.AddHttpClient("ODataAPI", client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7145");
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            });
 
             // Cấu hình Authentication
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

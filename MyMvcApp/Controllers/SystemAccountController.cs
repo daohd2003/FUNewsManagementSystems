@@ -62,21 +62,5 @@ namespace MyMvcApp.Controllers
             await _accountService.Delete(id);
             return RedirectToAction(nameof(Index));
         }
-
-        [HttpGet]
-        public IActionResult Report()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Report(DateTime startDate, DateTime endDate)
-        {
-            var articles = await _newsArticleService.GetNewsArticles();
-            var filtered = articles
-                .Where(a => a.CreatedDate >= startDate && a.CreatedDate <= endDate)
-                .OrderByDescending(a => a.CreatedDate);
-            return View("ReportResult", filtered);
-        }
     }
 }
