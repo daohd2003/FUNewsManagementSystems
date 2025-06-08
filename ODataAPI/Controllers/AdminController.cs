@@ -6,12 +6,12 @@ using Services;
 
 namespace ODataAPI.Controllers
 {
-    [Route("odata/newsArticles")]
-    public class NewsArticlesController : ODataController
+    [Route("odata/systemAccount")]
+    public class AdminController : ODataController
     {
-        private readonly INewsArticleService _service;
+        private readonly ISystemAccountService _service;
 
-        public NewsArticlesController(INewsArticleService service)
+        public AdminController(ISystemAccountService service)
         {
             _service = service;
         }
@@ -20,7 +20,7 @@ namespace ODataAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var articles = await _service.GetNewsArticles();
+            var articles = await _service.GetAccounts();
             return Ok(articles.AsQueryable());
         }
     }

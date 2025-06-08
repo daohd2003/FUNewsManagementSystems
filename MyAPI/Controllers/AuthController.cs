@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using BusinessObjects;
 using Configurations;
 using FUDTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -58,7 +60,7 @@ namespace MyAPI.Controllers
             else
             {
                 // Có user trong DB, kiểm tra password
-                if (user.AccountPassword != loginDto.Password)
+                if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.AccountPassword))
                 {
                     return Unauthorized("Invalid password");
                 }

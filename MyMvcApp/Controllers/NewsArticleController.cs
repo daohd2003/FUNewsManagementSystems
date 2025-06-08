@@ -5,6 +5,9 @@ using Services;
 using MyMvcApp.Utilities;
 using BusinessObjects;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json.Linq;
+using System.Drawing.Printing;
+using System.Net.Http;
 
 namespace MyMvcApp.Controllers
 {
@@ -14,18 +17,44 @@ namespace MyMvcApp.Controllers
         private readonly INewsArticleService _newsArticleService;
         private readonly ICategoryService _categoryService;
         private readonly ISystemAccountService _systemAccountService;
+        private readonly HttpClient _httpClient;
 
-        public NewsArticleController(INewsArticleService newsArticleService, ICategoryService categoryService, ISystemAccountService systemAccountService)
+        public NewsArticleController(INewsArticleService newsArticleService, ICategoryService categoryService, ISystemAccountService systemAccountService, IHttpClientFactory factory)
         {
             _newsArticleService = newsArticleService;
             _categoryService = categoryService;
             _systemAccountService = systemAccountService;
+            _httpClient = factory.CreateClient("ODataAPI");
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 3)
         {
-            var news = await _newsArticleService.GetNewsArticles();
-            return View(news);
+            int skip = (pageNumber - 1) * pageSize;
+
+            // Gửi truy vấn OData đến API với phân trang
+            string query = $"/odata/newsArticles?" +
+            $"&$skip={skip}&$top={pageSize}&$count=true";
+
+            var response = await _httpClient.GetAsync(query);
+            Console.WriteLine("Status Code: " + response.StatusCode);
+            if (!response.IsSuccessStatusCode)
+                return View("Error");
+
+            var content = await response.Content.ReadAsStringAsync();
+            var json = JObject.Parse(content);
+
+            var accounts = json["value"].ToObject<List<NewsArticleDTO>>();
+            int totalCount = json["@odata.count"]?.Value<int>() ?? 0;
+
+            var model = new PagedListViewModel<NewsArticleDTO>
+            {
+                Items = accounts,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+
+            return View(model);
         }
 
         public async Task<IActionResult> Details(string id)

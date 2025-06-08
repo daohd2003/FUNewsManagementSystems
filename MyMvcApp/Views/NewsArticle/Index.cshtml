@@ -1,4 +1,5 @@
-﻿@model IEnumerable<FUDTOs.NewsArticleDTO>
+﻿@model FUDTOs.PagedListViewModel<FUDTOs.NewsArticleDTO>
+
 
 @{
     ViewData["Title"] = "News Articles";
@@ -28,7 +29,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (!Model.Any())
+            @if (!Model.Items.Any())
             {
                 <tr>
                     <td colspan="4" class="text-center text-muted">No news articles found.</td>
@@ -36,7 +37,7 @@
             }
             else
             {
-                foreach (var item in Model)
+                foreach (var item in Model.Items)
                 {
                     <tr>
                         <td>@item.NewsTitle</td>
@@ -70,3 +71,16 @@
         </tbody>
     </table>
 </div>
+<nav>
+    <ul class="pagination justify-content-center">
+        @{
+            int totalPages = (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
+            for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+                </li>
+            }
+        }
+    </ul>
+</nav>

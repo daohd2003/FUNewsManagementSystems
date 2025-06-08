@@ -14,7 +14,14 @@ namespace ODataAPI
             builder.Services.AddControllers().AddOData(opt =>
             {
                 opt.EnableQueryFeatures()
-                    .AddRouteComponents("odata", ODataEdmModelBuilder.GetEdmModel());
+                    .AddRouteComponents("odata", ODataEdmModelBuilder.GetEdmModel())
+                    .Select()
+                    .Filter()
+                    .Expand()
+                    .OrderBy()
+                    .Count()
+                    .Expand()
+                    .SetMaxTop(100); ;
             });
 
             var apiBaseAddress = "https://localhost:7185/api/";
@@ -25,6 +32,15 @@ namespace ODataAPI
                 client.BaseAddress = new Uri(apiBaseAddress);
             });
 
+            builder.Services.AddHttpClient<ISystemAccountService, SystemAccountService>(client =>
+            {
+                client.BaseAddress = new Uri(apiBaseAddress);
+            });
+
+            builder.Services.AddHttpClient<ICategoryService, CategoryService>(client =>
+            {
+                client.BaseAddress = new Uri(apiBaseAddress);
+            });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

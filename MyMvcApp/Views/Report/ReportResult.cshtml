@@ -1,7 +1,8 @@
-﻿@model IEnumerable<FUDTOs.NewsArticleDTO>
+﻿@model FUDTOs.ReportViewModel
 
 @{
     ViewData["Title"] = "Report Results";
+    var totalPages = (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize);
 }
 
 <h2>@ViewData["Title"]</h2>
@@ -17,15 +18,32 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var article in Model)
+        @foreach (var article in Model.Articles)
         {
             <tr>
                 <td>@article.NewsTitle</td>
                 <td>@article.CreatedDate.ToString()</td>
                 <td>@(article.NewsStatus ? "Active" : "Inactive")</td>
-                <td>@article.CreatedBy.AccountName</td>
-                <td>@article.Category.CategoryName</td>
+                <td>@article.CreatedBy?.AccountName</td>
+                <td>@article.Category?.CategoryName</td>
             </tr>
         }
     </tbody>
 </table>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                <form asp-controller="Report" asp-action="Report" method="post" style="display:inline;">
+                    <input type="hidden" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+                    <input type="hidden" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+                    <input type="hidden" name="pageNumber" value="@i" />
+                    <input type="hidden" name="pageSize" value="@Model.PageSize" />
+                    <button type="submit" class="page-link">@i</button>
+                </form>
+            </li>
+        }
+    </ul>
+</nav>

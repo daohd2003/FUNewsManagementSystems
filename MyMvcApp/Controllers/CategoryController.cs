@@ -5,6 +5,9 @@ using Services;
 using MyMvcApp.Utilities;
 using BusinessObjects;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json.Linq;
+using System.Drawing.Printing;
+using System.Net.Http;
 
 namespace MyMvcApp.Controllers
 {
@@ -12,18 +15,43 @@ namespace MyMvcApp.Controllers
     public class CategoryController : Controller
     {
         private readonly ICategoryService _categoryService;
+        private readonly HttpClient _httpClient;
 
-        public CategoryController(ICategoryService categoryService)
+        public CategoryController(ICategoryService categoryService, IHttpClientFactory factory)
         {
             _categoryService = categoryService;
+            _httpClient = factory.CreateClient("ODataAPI");
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 3)
         {
             try
             {
-                var categories = await _categoryService.GetCategories();
-                return View(categories);
+                int skip = (pageNumber - 1) * pageSize;
+
+                // Gửi truy vấn OData đến API với phân trang
+                string query = $"/odata/category?" +
+                $"&$skip={skip}&$top={pageSize}&$count=true";
+
+                var response = await _httpClient.GetAsync(query);
+                if (!response.IsSuccessStatusCode)
+                    return View("Error");
+
+                var content = await response.Content.ReadAsStringAsync();
+                var json = JObject.Parse(content);
+
+                var accounts = json["value"].ToObject<List<CategoryDTO>>();
+                int totalCount = json["@odata.count"]?.Value<int>() ?? 0;
+
+                var model = new PagedListViewModel<CategoryDTO>
+                {
+                    Items = accounts,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalCount = totalCount
+                };
+
+                return View(model);
             }
             catch (Exception ex)
             {
