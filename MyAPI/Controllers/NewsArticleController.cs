@@ -48,7 +48,8 @@ namespace MyAPI.Controllers
         public async Task<IActionResult> Create(NewsArticleDTO dto)
         {
             var entity = _mapper.Map<NewsArticle>(dto);
-            await _newsRepo.Add(entity);
+            var tagIds = dto.Tags?.Select(t => t.TagId).ToList() ?? new List<int>();
+            await _newsRepo.Add(entity, tagIds);
             return Content("Insert success!");
         }
 
@@ -61,7 +62,9 @@ namespace MyAPI.Controllers
             if (exist == null) return NotFound();
 
             var updated = _mapper.Map<NewsArticle>(dto);
-            await _newsRepo.Update(updated);
+            var tagIds = dto.Tags?.Select(t => t.TagId).ToList() ?? new List<int>();
+
+            await _newsRepo.Update(updated, tagIds);
             return Content("Update success!");
         }
 

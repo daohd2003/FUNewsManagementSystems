@@ -11,8 +11,8 @@ namespace Repositories
     {
         Task<IEnumerable<NewsArticle>> GetAllNews();
         Task<NewsArticle> GetNewsById(string id);
-        Task Add(NewsArticle news);
-        Task Update(NewsArticle news);
+        Task Add(NewsArticle news, List<int> tagIds);
+        Task Update(NewsArticle news, List<int> newTagIds);
         Task Delete(string id);
         Task<IEnumerable<NewsArticle>> GetByAuthor(short authorId);
     }

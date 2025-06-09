@@ -1,4 +1,5 @@
 ﻿@model FUDTOs.NewsArticleDTO
+@using FUDTOs
 
 @{
     ViewData["Title"] = "Edit";
@@ -80,7 +81,17 @@
                 <label asp-for="ModifiedDate" class="control-label"></label>
                 <input asp-for="ModifiedDate" class="form-control" readonly />
             </div>
-
+            <div class="form-group">
+                <label for="SelectedTags">Tags</label>
+                <select name="SelectedTags" id="SelectedTags" multiple class="form-control">
+                    @foreach (var tag in (List<FUDTOs.TagDTO>)ViewBag.Tags)
+                    {
+                        <option value="@tag.TagId">
+                            @tag.TagName
+                        </option>
+                    }
+                </select>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>

@@ -41,6 +41,11 @@ namespace MyMvcApp
                 client.BaseAddress = new Uri(apiBaseAddress);
             }).AddHttpMessageHandler<JwtTokenHandler>();
 
+            builder.Services.AddHttpClient<ITagService, TagService>(client =>
+            {
+                client.BaseAddress = new Uri(apiBaseAddress);
+            }).AddHttpMessageHandler<JwtTokenHandler>();
+
             builder.Services.AddHttpClient("ODataAPI", client =>
             {
                 client.BaseAddress = new Uri("https://localhost:7145");

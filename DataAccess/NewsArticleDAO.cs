@@ -25,22 +25,41 @@ namespace DataAccess
                 .FirstOrDefaultAsync(n => n.NewsArticleId == id);
         }
 
-        public async Task AddAsync(NewsArticle entity)
+        public async Task AddAsync(NewsArticle entity, List<int> tagIds)
         {
+            var tags = await _context.Tags.Where(t => tagIds.Contains(t.TagId)).ToListAsync();
+
+            entity.Tags = tags;
+
             _context.NewsArticles.Add(entity);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(NewsArticle entity)
+        public async Task UpdateAsync(NewsArticle updatedArticle, List<int> newTagIds)
         {
-            var existing = await _context.NewsArticles
-                .FirstOrDefaultAsync(x => x.NewsArticleId == entity.NewsArticleId);
+            var existingArticle = await _context.NewsArticles
+                .Include(a => a.Tags)
+                .FirstOrDefaultAsync(a => a.NewsArticleId == updatedArticle.NewsArticleId);
 
-            if (existing != null)
+            if (existingArticle == null)
+                return;
+
+            // Cập nhật thông tin cơ bản
+            _context.Entry(existingArticle).CurrentValues.SetValues(updatedArticle);
+
+            // Cập nhật lại Tags
+            var newTags = await _context.Tags.Where(t => newTagIds.Contains(t.TagId)).ToListAsync();
+
+            // Clear old tags
+            existingArticle.Tags.Clear();
+
+            // Gán lại tags mới
+            foreach (var tag in newTags)
             {
-                _context.Entry(existing).CurrentValues.SetValues(entity);
-                await _context.SaveChangesAsync();
+                existingArticle.Tags.Add(tag);
             }
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(string id)

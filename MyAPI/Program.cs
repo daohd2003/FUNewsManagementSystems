@@ -72,6 +72,7 @@ namespace MyAPI
             builder.Services.AddScoped<ISystemAccountRepository, SystemAccountRepository>();
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<INewsArticleRepository, NewsArticleRepository>();
+            builder.Services.AddScoped<ITagRepository, TagRepository>();
 
             // Swagger configuration
             builder.Services.AddEndpointsApiExplorer();

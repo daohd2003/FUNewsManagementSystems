@@ -17,14 +17,16 @@ namespace MyMvcApp.Controllers
         private readonly INewsArticleService _newsArticleService;
         private readonly ICategoryService _categoryService;
         private readonly ISystemAccountService _systemAccountService;
+        private readonly ITagService _tagService;
         private readonly HttpClient _httpClient;
 
-        public NewsArticleController(INewsArticleService newsArticleService, ICategoryService categoryService, ISystemAccountService systemAccountService, IHttpClientFactory factory)
+        public NewsArticleController(INewsArticleService newsArticleService, ICategoryService categoryService, ISystemAccountService systemAccountService, IHttpClientFactory factory, ITagService tagService)
         {
             _newsArticleService = newsArticleService;
             _categoryService = categoryService;
             _systemAccountService = systemAccountService;
             _httpClient = factory.CreateClient("ODataAPI");
+            _tagService = tagService;
         }
 
         public async Task<IActionResult> Index(string searchTerm = "", string sortField = "CreatedDate", string sortDirection = "desc", int pageNumber = 1, int pageSize = 3)
@@ -100,6 +102,9 @@ namespace MyMvcApp.Controllers
             ViewBag.CreatedById = new SelectList(users, "AccountId", "AccountName");
             ViewBag.UpdatedById = new SelectList(users, "AccountId", "AccountName");
 
+            var tags = await _tagService.GetTags();
+            ViewBag.Tags = tags;
+
             return View();
         }
 
@@ -115,6 +120,8 @@ namespace MyMvcApp.Controllers
                 var users = await _systemAccountService.GetAccounts();
                 ViewBag.CreatedById = new SelectList(users, "AccountId", "AccountName");
                 ViewBag.UpdatedById = new SelectList(users, "AccountId", "AccountName");
+                ViewBag.Tags = await _tagService.GetTags();
+
             }
 
             try
@@ -130,6 +137,13 @@ namespace MyMvcApp.Controllers
 
                 dto.ModifiedDate = DateTime.Now;
 
+                var allTags = await _tagService.GetTags();
+
+                var selectedTagIds = Request.Form["SelectedTags"].ToList();
+                var selectedTags = allTags
+                    .Where(t => selectedTagIds.Contains(t.TagId.ToString()))
+                    .ToList();
+                dto.Tags = selectedTags;
                 await _newsArticleService.Create(dto);
 
                 return RedirectToAction(nameof(Index));
@@ -155,6 +169,10 @@ namespace MyMvcApp.Controllers
             var users = await _systemAccountService.GetAccounts();
             ViewBag.CreatedById = new SelectList(users, "AccountId", "AccountName", article.CreatedById);
             ViewBag.UpdatedById = new SelectList(users, "AccountId", "AccountName", article.UpdatedById);
+
+            var tags = await _tagService.GetTags();
+            ViewBag.Tags = tags;
+            ViewBag.SelectedTagIds = article.Tags?.Select(t => t.TagId.ToString()).ToList() ?? new List<string>();
 
             return View(article);
         }
