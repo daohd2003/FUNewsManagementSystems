@@ -31,15 +31,33 @@ namespace MyMvcApp.Controllers
         {
             int skip = (pageNumber - 1) * pageSize;
 
-            string filterQuery = string.IsNullOrEmpty(searchTerm)
+            // Filter theo từ khóa tìm kiếm
+            string searchFilter = string.IsNullOrEmpty(searchTerm)
                 ? ""
-                : $"$filter=contains(NewsTitle,'{searchTerm}')&";
+                : $"contains(NewsTitle,'{searchTerm}')";
+
+            // Thêm filter theo NewsStatus nếu chưa đăng nhập
+            string statusFilter = User.Identity.IsAuthenticated ? "" : "NewsStatus eq true";
+
+            // Gộp các filter lại nếu cần
+            string combinedFilter = "";
+            if (!string.IsNullOrEmpty(searchFilter) && !string.IsNullOrEmpty(statusFilter))
+            {
+                combinedFilter = $"$filter=({searchFilter}) and ({statusFilter})&";
+            }
+            else if (!string.IsNullOrEmpty(searchFilter))
+            {
+                combinedFilter = $"$filter={searchFilter}&";
+            }
+            else if (!string.IsNullOrEmpty(statusFilter))
+            {
+                combinedFilter = $"$filter={statusFilter}&";
+            }
 
             string orderByQuery = $"$orderby={sortField} {sortDirection}&";
-
             string pagingQuery = $"$skip={skip}&$top={pageSize}&$count=true";
 
-            string query = $"/odata/newsArticles?{filterQuery}{orderByQuery}{pagingQuery}";
+            string query = $"/odata/newsArticles?{combinedFilter}{orderByQuery}{pagingQuery}";
 
             var response = await _httpClient.GetAsync(query);
             if (!response.IsSuccessStatusCode)
