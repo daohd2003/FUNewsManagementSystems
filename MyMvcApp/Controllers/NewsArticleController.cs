@@ -27,32 +27,41 @@ namespace MyMvcApp.Controllers
             _httpClient = factory.CreateClient("ODataAPI");
         }
 
-        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 3)
+        public async Task<IActionResult> Index(string searchTerm = "", string sortField = "CreatedDate", string sortDirection = "desc", int pageNumber = 1, int pageSize = 3)
         {
             int skip = (pageNumber - 1) * pageSize;
 
-            // Gửi truy vấn OData đến API với phân trang
-            string query = $"/odata/newsArticles?" +
-            $"&$skip={skip}&$top={pageSize}&$count=true";
+            string filterQuery = string.IsNullOrEmpty(searchTerm)
+                ? ""
+                : $"$filter=contains(NewsTitle,'{searchTerm}')&";
+
+            string orderByQuery = $"$orderby={sortField} {sortDirection}&";
+
+            string pagingQuery = $"$skip={skip}&$top={pageSize}&$count=true";
+
+            string query = $"/odata/newsArticles?{filterQuery}{orderByQuery}{pagingQuery}";
 
             var response = await _httpClient.GetAsync(query);
-            Console.WriteLine("Status Code: " + response.StatusCode);
             if (!response.IsSuccessStatusCode)
                 return View("Error");
 
             var content = await response.Content.ReadAsStringAsync();
             var json = JObject.Parse(content);
 
-            var accounts = json["value"].ToObject<List<NewsArticleDTO>>();
+            var articles = json["value"].ToObject<List<NewsArticleDTO>>();
             int totalCount = json["@odata.count"]?.Value<int>() ?? 0;
 
             var model = new PagedListViewModel<NewsArticleDTO>
             {
-                Items = accounts,
+                Items = articles,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
                 TotalCount = totalCount
             };
+
+            ViewBag.CurrentSearch = searchTerm;
+            ViewBag.CurrentSortField = sortField;
+            ViewBag.CurrentSortDirection = sortDirection;
 
             return View(model);
         }

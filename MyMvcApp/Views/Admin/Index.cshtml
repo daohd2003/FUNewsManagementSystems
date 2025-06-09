@@ -7,6 +7,28 @@
 <h2>@ViewData["Title"]</h2>
 <a class="btn btn-primary mb-3" asp-action="Create">Create New Account</a>
 
+<form method="get" class="mb-3 d-flex gap-2 align-items-center">
+
+    <input type="text"
+           name="searchTerm"
+           class="form-control me-2"
+           placeholder="Search by name or email..."
+           value="@ViewBag.CurrentSearch" />
+
+    <select name="sortField" class="form-select me-2">
+        <option value="AccountName" selected="@(ViewBag.CurrentSortField == "AccountName" ? "selected" : null)">Name</option>
+        <option value="AccountEmail" selected="@(ViewBag.CurrentSortField == "AccountEmail" ? "selected" : null)">Email</option>
+        <option value="AccountRole" selected="@(ViewBag.CurrentSortField == "AccountRole" ? "selected" : null)">Role</option>
+    </select>
+
+    <select name="sortDirection" class="form-select me-2">
+        <option value="asc" selected="@(ViewBag.CurrentSortDirection == "asc" ? "selected" : null)">Ascending</option>
+        <option value="desc" selected="@(ViewBag.CurrentSortDirection == "desc" ? "selected" : null)">Descending</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -46,18 +68,42 @@
         }
 
         <li class="page-item @(Model.PageNumber == 1 ? "disabled" : "")">
-            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize">Previous</a>
+            <a class="page-link"
+               asp-action="Index"
+               asp-route-pageNumber="@(Model.PageNumber - 1)"
+               asp-route-pageSize="@Model.PageSize"
+               asp-route-searchTerm="@ViewBag.CurrentSearch"
+               asp-route-sortField="@ViewBag.CurrentSortField"
+               asp-route-sortDirection="@ViewBag.CurrentSortDirection">
+                Previous
+            </a>
         </li>
 
         @for (int i = 1; i <= totalPages; i++)
         {
             <li class="page-item @(Model.PageNumber == i ? "active" : "")">
-                <a class="page-link" asp-action="Index" asp-route-pageNumber="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-pageNumber="@i"
+                   asp-route-pageSize="@Model.PageSize"
+                   asp-route-searchTerm="@ViewBag.CurrentSearch"
+                   asp-route-sortField="@ViewBag.CurrentSortField"
+                   asp-route-sortDirection="@ViewBag.CurrentSortDirection">
+                    @i
+                </a>
             </li>
         }
 
         <li class="page-item @(Model.PageNumber == totalPages ? "disabled" : "")">
-            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize">Next</a>
+            <a class="page-link"
+               asp-action="Index"
+               asp-route-pageNumber="@(Model.PageNumber + 1)"
+               asp-route-pageSize="@Model.PageSize"
+               asp-route-searchTerm="@ViewBag.CurrentSearch"
+               asp-route-sortField="@ViewBag.CurrentSortField"
+               asp-route-sortDirection="@ViewBag.CurrentSortDirection">
+                Next
+            </a>
         </li>
     </ul>
 </nav>

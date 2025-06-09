@@ -23,13 +23,28 @@ namespace MyMvcApp.Controllers
 
         }
 
-        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 3)
+        public async Task<IActionResult> Index(
+                string? searchTerm,
+                string? sortField = "AccountName",
+                string? sortDirection = "asc",
+                int pageNumber = 1,
+                int pageSize = 3)
         {
             int skip = (pageNumber - 1) * pageSize;
 
-            // Gửi truy vấn OData đến API với phân trang
-            string query = $"/odata/systemAccount?" +
-            $"&$skip={skip}&$top={pageSize}&$count=true";
+            // Xây dựng filter cho searchTerm nếu có
+            string filter = "";
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                // OData contains với AccountName hoặc AccountEmail
+                filter = $"$filter=contains(AccountName,'{searchTerm}') or contains(AccountEmail,'{searchTerm}')";
+            }
+
+            // Xây dựng orderby cho sort
+            string orderby = $"$orderby={sortField} {sortDirection}";
+
+            // Kết hợp query OData
+            string query = $"/odata/systemAccount?{filter}&{orderby}&$skip={skip}&$top={pageSize}&$count=true";
 
             var response = await _httpClient.GetAsync(query);
             if (!response.IsSuccessStatusCode)
@@ -40,6 +55,10 @@ namespace MyMvcApp.Controllers
 
             var accounts = json["value"].ToObject<List<SystemAccountDTO>>();
             int totalCount = json["@odata.count"]?.Value<int>() ?? 0;
+
+            ViewBag.CurrentSearch = searchTerm;
+            ViewBag.CurrentSortField = sortField;
+            ViewBag.CurrentSortDirection = sortDirection;
 
             var model = new PagedListViewModel<SystemAccountDTO>
             {

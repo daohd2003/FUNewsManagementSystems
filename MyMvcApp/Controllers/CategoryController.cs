@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json.Linq;
 using System.Drawing.Printing;
 using System.Net.Http;
+using static NuGet.Packaging.PackagingConstants;
 
 namespace MyMvcApp.Controllers
 {
@@ -23,42 +24,58 @@ namespace MyMvcApp.Controllers
             _httpClient = factory.CreateClient("ODataAPI");
         }
 
-        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 3)
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 3, string searchTerm = "", string sortField = "CategoryName", string sortDirection = "asc", string isActive = null)
         {
-            try
+
+            int skip = (pageNumber - 1) * pageSize;
+
+            List<string> filters = new();
+
+            if (!string.IsNullOrEmpty(searchTerm))
             {
-                int skip = (pageNumber - 1) * pageSize;
+                filters.Add($"contains(CategoryName,'{searchTerm}') or contains(CategoryDesciption,'{searchTerm}')");
+            }
 
-                // Gửi truy vấn OData đến API với phân trang
-                string query = $"/odata/category?" +
-                $"&$skip={skip}&$top={pageSize}&$count=true";
-
-                var response = await _httpClient.GetAsync(query);
-                if (!response.IsSuccessStatusCode)
-                    return View("Error");
-
-                var content = await response.Content.ReadAsStringAsync();
-                var json = JObject.Parse(content);
-
-                var accounts = json["value"].ToObject<List<CategoryDTO>>();
-                int totalCount = json["@odata.count"]?.Value<int>() ?? 0;
-
-                var model = new PagedListViewModel<CategoryDTO>
+            bool? isActiveBool = null;
+            if (!string.IsNullOrEmpty(isActive))
+            {
+                if (bool.TryParse(isActive, out bool parsedBool))
                 {
-                    Items = accounts,
-                    PageNumber = pageNumber,
-                    PageSize = pageSize,
-                    TotalCount = totalCount
-                };
+                    isActiveBool = parsedBool;
+                    filters.Add($"IsActive eq {isActiveBool.Value.ToString().ToLower()}");
+                }
+            }
 
-                return View(model);
-            }
-            catch (Exception ex)
+            string filterQuery = filters.Count > 0 ? $"&$filter={string.Join(" and ", filters)}" : "";
+
+            string orderby = $"&$orderby={sortField} {sortDirection}";
+
+            string query = $"/odata/category?$skip={skip}&$top={pageSize}&$count=true{filterQuery}{orderby}";
+
+            var response = await _httpClient.GetAsync(query);
+            if (!response.IsSuccessStatusCode)
+                return View("Error");
+
+            var content = await response.Content.ReadAsStringAsync();
+            var json = JObject.Parse(content);
+
+            var categories = json["value"].ToObject<List<CategoryDTO>>();
+            int totalCount = json["@odata.count"]?.Value<int>() ?? 0;
+
+            var model = new PagedListViewModel<CategoryDTO>
             {
-                Console.WriteLine($"Error retrieving categories: {ex.Message}");
-                TempData["ErrorMessage"] = "An error occurred while loading categories";
-                return View(new List<CategoryDTO>());
-            }
+                Items = categories,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+
+            ViewBag.CurrentSearch = searchTerm;
+            ViewBag.CurrentSortField = sortField;
+            ViewBag.CurrentSortDirection = sortDirection;
+            ViewBag.CurrentIsActive = isActive;
+
+            return View(model);
         }
 
         [HttpGet]
