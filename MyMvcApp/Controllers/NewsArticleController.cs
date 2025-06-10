@@ -185,6 +185,14 @@ namespace MyMvcApp.Controllers
 
             dto.ModifiedDate = DateTime.Now;
 
+            var allTags = await _tagService.GetTags();
+
+            var selectedTagIds = Request.Form["SelectedTags"].ToList();
+            var selectedTags = allTags
+                .Where(t => selectedTagIds.Contains(t.TagId.ToString()))
+                .ToList();
+            dto.Tags = selectedTags;
+
             await _newsArticleService.Update(dto);
             return RedirectToAction(nameof(Index));
         }

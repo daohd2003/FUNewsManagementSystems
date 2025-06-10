@@ -86,7 +86,8 @@
                 <select name="SelectedTags" id="SelectedTags" multiple class="form-control">
                     @foreach (var tag in (List<FUDTOs.TagDTO>)ViewBag.Tags)
                     {
-                        <option value="@tag.TagId">
+                        <option value="@tag.TagId"
+                                selected="@(ViewBag.SelectedTagIds != null && ViewBag.SelectedTagIds.Contains(tag.TagId.ToString()))">
                             @tag.TagName
                         </option>
                     }

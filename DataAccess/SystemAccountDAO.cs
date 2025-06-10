@@ -34,12 +34,12 @@ namespace DataAccess
                 throw new Exception("Entity not found");
             }
 
-            if (existingEntity != null)
+            if (entity.AccountPassword != existingEntity.AccountPassword)
             {
-                _context.Entry(existingEntity).CurrentValues.SetValues(entity);
-                await _context.SaveChangesAsync();
+                entity.AccountPassword = BCrypt.Net.BCrypt.HashPassword(entity.AccountPassword);
             }
 
+            _context.Entry(existingEntity).CurrentValues.SetValues(entity);
             await _context.SaveChangesAsync();
         }
 
